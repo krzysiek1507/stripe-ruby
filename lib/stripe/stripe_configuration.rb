@@ -24,8 +24,13 @@ module Stripe
   #
   # If `.logger` is set, the value of `.log_level` is ignored. The decision on
   # what levels to print is entirely deferred to the logger.
+  #
+  # =request_headers_hook=
+  # An optional callable invoked with the finalized request method, URI, body,
+  # and headers. It should return a hash of additional headers to send.
   class StripeConfiguration
-    attr_accessor :api_key, :api_version, :client_id, :enable_telemetry, :logger, :stripe_account, :stripe_context
+    attr_accessor :api_key, :api_version, :client_id, :enable_telemetry, :logger,
+                  :request_headers_hook, :stripe_account, :stripe_context
 
     attr_reader :api_base, :uploads_base, :connect_base, :meter_events_base, :base_addresses, :ca_bundle_path,
                 :log_level, :initial_network_retry_delay, :max_network_retries, :max_network_retry_delay,
