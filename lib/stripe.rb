@@ -108,6 +108,7 @@ module Stripe
     max_network_retries
     enable_telemetry
     client_id
+    request_headers_hook
   ])
 
   @app_info = nil
@@ -138,6 +139,7 @@ module Stripe
     def_delegators :@config, :max_network_retries, :max_network_retries=
     def_delegators :@config, :enable_telemetry=, :enable_telemetry?
     def_delegators :@config, :client_id=, :client_id
+    def_delegators :@config, :request_headers_hook=, :request_headers_hook
 
     # Internal configurations
     def_delegators :@config, :max_network_retry_delay

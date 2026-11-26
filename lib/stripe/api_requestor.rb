@@ -538,6 +538,21 @@ module Stripe
       body, body_log =
         body_params ? encode_body(body_params, headers, api_mode) : [nil, nil]
 
+      if config.request_headers_hook
+        # Invoke once for this logical request, before network retries, so
+        # signatures are based on the same encoded payload for every attempt.
+        request_uri = query ? "#{url}?#{query}" : url
+        extra_headers = config.request_headers_hook.call(
+          method: method,
+          uri: request_uri,
+          body: body,
+          headers: headers.dup
+        )
+        raise ArgumentError, "request_headers_hook should return a hash of headers" unless extra_headers.is_a?(Hash)
+
+        headers.update(Util.normalize_headers(extra_headers))
+      end
+
       # stores information on the request we're about to make so that we don't
       # have to pass as many parameters around for logging.
       context = RequestLogContext.new

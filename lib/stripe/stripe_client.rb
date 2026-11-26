@@ -24,7 +24,8 @@ module Stripe
                    uploads_base: nil,
                    connect_base: nil,
                    meter_events_base: nil,
-                   client_id: nil)
+                   client_id: nil,
+                   request_headers_hook: nil)
       unless api_key
         raise AuthenticationError, "No API key provided. " \
                                    'Set your API key using "client = Stripe::StripeClient.new(<API-KEY>)". ' \
@@ -43,6 +44,7 @@ module Stripe
         connect_base: connect_base,
         meter_events_base: meter_events_base,
         client_id: client_id,
+        request_headers_hook: request_headers_hook,
       }.compact
 
       config = StripeConfiguration.client_init(config_opts)
@@ -132,7 +134,8 @@ module Stripe
         uploads_base: config.uploads_base,
         connect_base: config.connect_base,
         meter_events_base: config.meter_events_base,
-        client_id: config.client_id
+        client_id: config.client_id,
+        request_headers_hook: config.request_headers_hook
       )
     end
 

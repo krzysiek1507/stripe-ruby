@@ -492,6 +492,30 @@ module Stripe
                         opts: { stripe_account: "bar" },
                         &@read_body_chunk_block)
           end
+
+          should "invoke the request hook with the encoded request and send its headers" do
+            hook_args = nil
+            request = nil
+            hook = lambda do |method:, uri:, body:, headers:|
+              hook_args = { method: method, uri: uri, body: body, headers: headers }
+              { "X-Request-Signature" => "signed:#{method}:#{uri}:#{body}" }
+            end
+
+            stub_request(:post, "#{Stripe::DEFAULT_API_BASE}/v1/account")
+              .with { |req| request = req }
+              .to_return(body: JSON.generate(object: "account"))
+
+            client = APIRequestor.new(api_key: "sk_test_123", request_headers_hook: hook)
+            client.send(request_method, :post, "/v1/account", :api,
+                        params: { amount: 100 },
+                        &@read_body_chunk_block)
+
+            assert_equal :post, hook_args[:method]
+            assert_equal "#{Stripe::DEFAULT_API_BASE}/v1/account", hook_args[:uri]
+            assert_equal "amount=100", hook_args[:body]
+            assert_equal "Bearer sk_test_123", hook_args[:headers]["Authorization"]
+            assert_equal "signed:post:#{hook_args[:uri]}:amount=100", request.headers["X-Request-Signature"]
+          end
         end
 
         context "logging" do
